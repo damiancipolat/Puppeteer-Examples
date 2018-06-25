@@ -16,3 +16,9 @@ $ npm install
 $ node app.js
 ```
 
+- **Scrapping data**: Example of scrapping data from the website https://www.elmejortrato.com.ar
+```sh
+$ cd scrapping
+$ npm install
+$ node app.js
+```
