@@ -76,9 +76,21 @@ const run = ()=>{
 
         console.log('-> Loading: ',url);
  
-        getCaptcha(page,'img-captcha.png')
-          .then((final) => console.log(final))
-          .catch((err)  => console.log(err));
+       //Take a snapshoot.
+        page.screenshot({path:pathDownload,type:'png',fullPage:true}).then((result)=>{
+
+          console.log('-> Snapshoot ok, extracting captcha...');
+
+          getCaptcha(page,'img-captcha.png')
+            .then((final) => {
+
+              console.log(final);
+              process.exit();
+
+            })
+            .catch((err)  => console.log(err));          
+
+        });
 
       }).catch((err)=>console.log('err',err));
 
