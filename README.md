@@ -23,3 +23,17 @@ $ cd scrapping
 $ npm install
 $ node app.js
 ```
+
+- **Capture control**: Example capturing a image captcha from the web http://www.afip.gov.ar/mercurio/consultapadron/buscarcontribuyente.aspx.
+```sh
+$ cd capture-control
+$ npm install
+$ node app.js
+```
+
+- **Download all**: Example downloading all the images from a website.
+```sh
+$ cd image-downloader
+$ npm install
+$ node app.js
+```
