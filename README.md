@@ -37,3 +37,10 @@ $ cd image-downloader
 $ npm install
 $ node app.js
 ```
+
+- **Capture control & Anticaptcha**: Example capturing a image captcha from the web http://www.afip.gov.ar/mercurio/consultapadron/buscarcontribuyente.aspx and using a third part service in this case anticapcha.com to recognize the text and retrieve them.
+```sh
+$ cd capture-control
+$ npm install
+$ node app.js
+```
