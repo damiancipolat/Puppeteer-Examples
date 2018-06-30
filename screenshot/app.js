@@ -7,6 +7,8 @@ const run = ()=>{
   const url          = 'https://github.com';
   const pathDownload = './github.png';
 
+  console.log('> Taking snapshoot of: '+url);
+
   //Start puppeteer.
   const bot = puppeteer.launch({headless:true,args:['--no-sandbox','--disable-setuid-sandbox']});
 
@@ -32,7 +34,6 @@ const run = ()=>{
     });
 
   }).catch((err)=>console.log('err',err));
-
 
 }
 
