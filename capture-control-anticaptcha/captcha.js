@@ -1,4 +1,4 @@
-const captchaKey  = 'xxxxxxxxxxxxxxxxxxxxx';
+const captchaKey  = '6c3a0f455559f969130003ddb74f4a3b';
 const anticaptcha = require('./anticaptcha')(captchaKey);
 
 //Get anticaptcha balance.

@@ -2,7 +2,14 @@ const puppeteer   = require('puppeteer');
 const fs          = require('fs');
 const captcha     = require('./captcha.js');
 
-const url         = 'http://www.afip.gov.ar/mercurio/consultapadron/buscarcontribuyente.aspx';
+const url  = 'http://www.afip.gov.ar/mercurio/consultapadron/buscarcontribuyente.aspx';
+
+const htmlKeys = {
+  inputCaptcha : '#txtCAPTCHA',
+  inputDni     : '#txtDNI',
+  btnFind      : '#cmdBuscar',
+  btnView      : '#cmdVer0'
+}
 
 //Get image.
 const getDataUrlThroughCanvas = (selector) => {
@@ -27,6 +34,7 @@ const getDataUrlThroughCanvas = (selector) => {
 
 }
 
+//Convert captured image to base64.
 const parseDataUrl = (dataUrl) => {
 
   const matches = dataUrl.match(/^data:(.+);base64,(.+)$/);
@@ -38,14 +46,69 @@ const parseDataUrl = (dataUrl) => {
 
 };
 
+//Fill the form.
+const fillForm = (page,captchaTxt,docTxt)=>{
+
+  return new Promise((resolve,reject)=>{
+
+    //Make click in the textbox.
+    page.click(htmlKeys.inputCaptcha).then((stat)=>{
+
+      //Type the captcha.
+      page.keyboard.type(captchaTxt).then((stat) => {
+
+        //Click in document input.
+        page.click(htmlKeys.inputDni).then((stat)=>{
+
+          //Type DNI-
+          page.keyboard.type('33295515').then((stat) => {
+
+            //Make click in send.            
+            page.click(htmlKeys.btnFind).then((stat)=>{
+
+              //Wait for page load.
+              page.waitForNavigation().then((stat)=>{
+
+                //Click in view more.
+                page.click(htmlKeys.btnFind).then((stat)=>{
+
+                  //Wait page reload and take a snapshoot.
+                  page.screenshot({path:'final-result.png',type:'png',fullPage:true})
+                    .then((result)=>{
+
+                      console.log('> Snapshoot ok!');
+                      resolve(result);
+                    
+                    });
+
+                });                
+
+              });
+
+            });
+
+          });
+
+        });
+        
+      });
+
+    });
+
+  });
+
+}
+
 //Retrieve captcha from documnent.
 const getCaptcha = (page,captchaFile)=>{
 
   return new Promise((resolve,reject)=>{
 
+    //Get the control from the document by id.
     page.evaluate(getDataUrlThroughCanvas, '#imgCaptcha')
       .then((data) => {
             
+        //Parse img to base64.
         let { buffer } = parseDataUrl(data);
         fs.writeFileSync(captchaFile, buffer, 'base64');
 
@@ -53,15 +116,18 @@ const getCaptcha = (page,captchaFile)=>{
         console.log('-> Sending img captcha to anticaptcha.com');
 
         //Send captacha to anticaptcha.
-        captcha.getCaptcha(data)
-          .then((result) => {
-            console.log('> Received from anticaptcha',result);
-            process.exit(0);
-          })
-          .catch((err)   => reject(err));
+        captcha.getCaptcha(data).then((result) => {
 
-      })
-      .catch((err) => reject(err));
+            console.log('> Received from anticaptcha',result);
+
+            //Fill data in the form.
+            fillForm(page,result,'33295515')
+              .then((stat) => resolve(stat))
+              .catch((err) => reject(err));
+
+          }).catch((err) => reject(err));
+
+      }).catch((err) => reject(err));
 
   });
 
@@ -91,6 +157,7 @@ const run = ()=>{
 
           console.log('-> Snapshoot ok, extracting captcha...');
 
+          //Extract the image from the image tag.
           getCaptcha(page,'img-captcha.png')
             .then((final) => {
 
